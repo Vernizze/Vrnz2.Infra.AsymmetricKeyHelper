@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30804.86
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vrnz2.Infra.AsymmetricKeyHelper", "Vrnz2.Infra.AsymmetricKeyHelper\Vrnz2.Infra.AsymmetricKeyHelper.csproj", "{9F8E66F5-53B7-4098-9885-D3FE99349617}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vrnz2.Infra.AsymmetricKeyHelper.Test", "Vrnz2.Infra.AsymmetricKeyHelper.Test\Vrnz2.Infra.AsymmetricKeyHelper.Test.csproj", "{EB6C6D7E-38CA-4364-B973-F34E9AD6B1FB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9F8E66F5-53B7-4098-9885-D3FE99349617}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F8E66F5-53B7-4098-9885-D3FE99349617}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F8E66F5-53B7-4098-9885-D3FE99349617}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F8E66F5-53B7-4098-9885-D3FE99349617}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB6C6D7E-38CA-4364-B973-F34E9AD6B1FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB6C6D7E-38CA-4364-B973-F34E9AD6B1FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB6C6D7E-38CA-4364-B973-F34E9AD6B1FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB6C6D7E-38CA-4364-B973-F34E9AD6B1FB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {75550B9F-57C3-40B3-BF6C-7C00E38B3A4C}
+	EndGlobalSection
+EndGlobal
