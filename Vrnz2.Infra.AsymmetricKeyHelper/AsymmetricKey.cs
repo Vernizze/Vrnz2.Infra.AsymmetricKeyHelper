@@ -13,36 +13,38 @@ namespace Vrnz2.Infra.AsymmetricKeyHelper
 
         private UTF8Encoding _encoder = new UTF8Encoding();
 
-        private string _private_key = string.Empty;
-        private string _public_key = string.Empty;
-
         #endregion
 
         #region Constructors
 
         public AsymmetricKey()
         {
-            this._private_key = AsymmetricKeyFileManager.GetInstance.PrivateKey;
-            this._public_key = AsymmetricKeyFileManager.GetInstance.PublicKey;
+            PrivateKey = AsymmetricKeyFileManager.GetInstance.PrivateKey;
+            PublicKey = AsymmetricKeyFileManager.GetInstance.PublicKey;
         }
+
+        #endregion
+
+        #region Attributes
+
+        public string PrivateKey { get; }
+        public string PublicKey { get; }
 
         #endregion
 
         #region Methods
 
         public void Dispose()
-        {
-            this._encoder = null;
+            => _encoder = null;
 
-            this._private_key = string.Empty;
-            this._public_key = string.Empty;
-        }
+        public RSACryptoServiceProvider GetRSACryptoServiceProvider()
+            => new RSACryptoServiceProvider();
 
         public string GeneratePublicKey()
         {
             var result = string.Empty;
 
-            using (var rsa = new RSACryptoServiceProvider())
+            using (var rsa = GetRSACryptoServiceProvider())
                 result = rsa.ToXmlString(false);
 
             return result;
@@ -52,7 +54,7 @@ namespace Vrnz2.Infra.AsymmetricKeyHelper
         {
             var result = string.Empty;
 
-            using (var rsa = new RSACryptoServiceProvider())
+            using (var rsa = GetRSACryptoServiceProvider())
                 result = rsa.ToXmlString(true);
 
             return result;
@@ -66,9 +68,9 @@ namespace Vrnz2.Infra.AsymmetricKeyHelper
 
             var dataToEncrypt = this._encoder.GetBytes(data);
 
-            using (var rsa = new RSACryptoServiceProvider())
+            using (var rsa = GetRSACryptoServiceProvider())
             {
-                rsa.FromXmlString2(this._public_key);
+                rsa.FromXmlString2(PublicKey);
 
                 encryptedByteArray = rsa.Encrypt(dataToEncrypt, false).ToArray();
             }
@@ -100,52 +102,13 @@ namespace Vrnz2.Infra.AsymmetricKeyHelper
                 dataByte[i] = Convert.ToByte(dataArray[i]);
             }
 
-            using (var rsa = new RSACryptoServiceProvider())
+            using (var rsa = GetRSACryptoServiceProvider())
             {
-                rsa.FromXmlString2(this._private_key);
+                rsa.FromXmlString2(PrivateKey);
                 decryptedByte = rsa.Decrypt(dataByte, false);
             }
 
             return _encoder.GetString(decryptedByte);
-        }
-
-        public string GetJwtSignature(string p_id, string u_id, string rnd)
-        {
-            byte[] plainText = UTF8Encoding.UTF8.GetBytes(string.Concat(p_id, u_id, rnd));
-            byte[] signature = null;
-
-            using (var rsaWrite = new RSACryptoServiceProvider())
-            {
-                rsaWrite.FromXmlString2(this._private_key);
-
-                signature = rsaWrite.SignData(plainText, CryptoConfig.MapNameToOID("SHA1"));
-            }
-
-            return Convert.ToBase64String(signature);
-        }
-
-        public bool JwtSignatureIsValid(string p_id, string u_id, string rnd, string sign)
-        {
-            var hash = new SHA1Managed();
-            var result = false;
-
-            byte[] signature = Convert.FromBase64String(sign);
-            byte[] original = UTF8Encoding.UTF8.GetBytes(string.Concat(p_id, u_id, rnd));
-            byte[] hashedData;
-
-            using (var rsaRead = new RSACryptoServiceProvider())
-            {
-                rsaRead.FromXmlString2(this._public_key);
-
-                if (rsaRead.VerifyData(original, CryptoConfig.MapNameToOID("SHA1"), signature))
-                {
-                    hashedData = hash.ComputeHash(original);
-
-                    result = rsaRead.VerifyHash(hashedData, CryptoConfig.MapNameToOID("SHA1"), signature);
-                }
-            }
-
-            return result;
         }
 
         #endregion
