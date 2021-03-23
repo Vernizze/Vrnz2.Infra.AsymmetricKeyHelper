@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -10,6 +11,12 @@ namespace Vrnz2.Infra.AsymmetricKeyHelper
     public class AsymmetricKey
            : IDisposable
     {
+        #region Cosntants
+
+        public const string DEFAULT_CERTIFICATE_FILE_NAME = "cert.akcfg";
+
+        #endregion
+
         #region Variables
 
         private UTF8Encoding _encoder = new UTF8Encoding();
@@ -25,6 +32,13 @@ namespace Vrnz2.Infra.AsymmetricKeyHelper
             if (!File.Exists(filePath)) return;
 
             _certificate = new X509Certificate2(ReadFile(filePath), pwd);
+        }
+
+        public AsymmetricKey(CertificateConfig certificateConfig)
+        {
+            if (!File.Exists(certificateConfig.certificate_file_path)) return;
+
+            _certificate = new X509Certificate2(ReadFile(certificateConfig.certificate_file_path), certificateConfig.certificate_pwd);
         }
 
         #endregion
@@ -54,6 +68,15 @@ namespace Vrnz2.Infra.AsymmetricKeyHelper
             }
 
             return data;
+        }
+
+        public static CertificateConfig GetCertificateConfig() 
+        {
+            if (!File.Exists(DEFAULT_CERTIFICATE_FILE_NAME)) return null;
+
+            string fileContent = File.ReadAllText(DEFAULT_CERTIFICATE_FILE_NAME);
+
+            return JsonConvert.DeserializeObject<CertificateConfig>(fileContent);
         }
 
         public string Encrypt(string data)
@@ -99,5 +122,11 @@ namespace Vrnz2.Infra.AsymmetricKeyHelper
         }
 
         #endregion
+    }
+
+    public class CertificateConfig
+    {
+    	public string certificate_file_path { get; set; }
+        public string certificate_pwd { get; set; }
     }
 }

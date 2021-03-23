@@ -11,7 +11,7 @@ namespace Vrnz2.Infra.AsymmetricKeyHelper.Test
         {
             var decrypt_value = string.Empty;
 
-            using (var asym_key = new AsymmetricKey()) 
+            using (var asym_key = new AsymmetricKey(AsymmetricKey.GetCertificateConfig())) 
             {
                 var encrypt_value = asym_key.Encrypt(valueToEncrypt);
 

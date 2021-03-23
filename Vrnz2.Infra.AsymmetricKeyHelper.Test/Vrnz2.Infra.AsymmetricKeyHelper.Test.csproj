@@ -23,4 +23,10 @@
     <ProjectReference Include="..\Vrnz2.Infra.AsymmetricKeyHelper\Vrnz2.Infra.AsymmetricKeyHelper.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="cert.akcfg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
