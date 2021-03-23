@@ -1,8 +1,9 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using Vrnz2.Infra.AsymmetricKeyHelper.Extensions;
 
 namespace Vrnz2.Infra.AsymmetricKeyHelper
 {
@@ -13,14 +14,17 @@ namespace Vrnz2.Infra.AsymmetricKeyHelper
 
         private UTF8Encoding _encoder = new UTF8Encoding();
 
+        private readonly X509Certificate2 _certificate;
+
         #endregion
 
         #region Constructors
 
-        public AsymmetricKey()
+        public AsymmetricKey(string filePath, string pwd)
         {
-            PrivateKey = AsymmetricKeyFileManager.GetInstance.PrivateKey;
-            PublicKey = AsymmetricKeyFileManager.GetInstance.PublicKey;
+            if (!File.Exists(filePath)) return;
+
+            _certificate = new X509Certificate2(ReadFile(filePath), pwd);
         }
 
         #endregion
@@ -37,27 +41,19 @@ namespace Vrnz2.Infra.AsymmetricKeyHelper
         public void Dispose()
             => _encoder = null;
 
-        public RSACryptoServiceProvider GetRSACryptoServiceProvider()
-            => new RSACryptoServiceProvider();
-
-        public string GeneratePublicKey()
+        private byte[] ReadFile(string fileName)
         {
-            var result = string.Empty;
+            byte[] data;
 
-            using (var rsa = GetRSACryptoServiceProvider())
-                result = rsa.ToXmlString(false);
+            using (FileStream f = new FileStream(fileName, FileMode.Open, FileAccess.Read)) 
+            {
+                int size = (int)f.Length;
+                data = new byte[size];
+                size = f.Read(data, 0, size);
+                f.Close();
+            }
 
-            return result;
-        }
-
-        public string GeneratePrivateKey()
-        {
-            var result = string.Empty;
-
-            using (var rsa = GetRSACryptoServiceProvider())
-                result = rsa.ToXmlString(true);
-
-            return result;
+            return data;
         }
 
         public string Encrypt(string data)
@@ -68,12 +64,8 @@ namespace Vrnz2.Infra.AsymmetricKeyHelper
 
             var dataToEncrypt = this._encoder.GetBytes(data);
 
-            using (var rsa = GetRSACryptoServiceProvider())
-            {
-                rsa.FromXmlString2(PublicKey);
-
-                encryptedByteArray = rsa.Encrypt(dataToEncrypt, false).ToArray();
-            }
+            using (RSA rsa = _certificate.GetRSAPublicKey())
+                encryptedByteArray = rsa.Encrypt(dataToEncrypt, RSAEncryptionPadding.OaepSHA1);
 
             var length = encryptedByteArray.Count();
 
@@ -98,15 +90,10 @@ namespace Vrnz2.Infra.AsymmetricKeyHelper
             byte[] dataByte = new byte[dataArray.Length];
 
             for (int i = 0; i < dataArray.Length; i++)
-            {
                 dataByte[i] = Convert.ToByte(dataArray[i]);
-            }
 
-            using (var rsa = GetRSACryptoServiceProvider())
-            {
-                rsa.FromXmlString2(PrivateKey);
-                decryptedByte = rsa.Decrypt(dataByte, false);
-            }
+            using (RSA rsa = _certificate.GetRSAPrivateKey())
+                decryptedByte = rsa.Decrypt(dataByte, RSAEncryptionPadding.OaepSHA1);
 
             return _encoder.GetString(decryptedByte);
         }

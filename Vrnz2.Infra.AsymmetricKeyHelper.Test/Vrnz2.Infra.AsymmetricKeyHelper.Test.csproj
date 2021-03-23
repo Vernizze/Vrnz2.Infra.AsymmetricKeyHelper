@@ -23,13 +23,4 @@
     <ProjectReference Include="..\Vrnz2.Infra.AsymmetricKeyHelper\Vrnz2.Infra.AsymmetricKeyHelper.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="_sec\private_key.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="_sec\public_key.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
 </Project>
