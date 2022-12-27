@@ -41,6 +41,15 @@ namespace Vrnz2.Infra.AsymmetricKeyHelper
             _certificate = new X509Certificate2(ReadFile(certificateConfig.certificate_file_path), certificateConfig.certificate_pwd);
         }
 
+        public AsymmetricKey(string certificateConfigPath)
+        {
+            var certificateConfig = GetCertificateConfig(certificateConfigPath);
+
+            if (certificateConfig == null) return;
+
+            _certificate = new X509Certificate2(ReadFile(certificateConfig.certificate_file_path), certificateConfig.certificate_pwd);
+        }
+
         #endregion
 
         #region Attributes
@@ -71,10 +80,13 @@ namespace Vrnz2.Infra.AsymmetricKeyHelper
         }
 
         public static CertificateConfig GetCertificateConfig() 
-        {
-            if (!File.Exists(DEFAULT_CERTIFICATE_FILE_NAME)) return null;
+            => GetCertificateConfig(DEFAULT_CERTIFICATE_FILE_NAME);
 
-            string fileContent = File.ReadAllText(DEFAULT_CERTIFICATE_FILE_NAME);
+        public static CertificateConfig GetCertificateConfig(string certificateConfigPath)
+        {
+            if (!File.Exists(certificateConfigPath)) return null;
+
+            string fileContent = File.ReadAllText(certificateConfigPath);
 
             return JsonConvert.DeserializeObject<CertificateConfig>(fileContent);
         }
